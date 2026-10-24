@@ -18,6 +18,18 @@
       "title": "Lec-2-Errors in Numerical Computing",
       "course": "CSE 3515 - Operating Systems",
       "type": "summary",
+      "content": "### 📌 Executive Overview\nThis study material focuses on the fundamental role of **approximations and errors** in numerical computing. Since computers have finite memory and human measurements are rarely perfect, errors are unavoidable. The text establishes a framework for understanding how these errors arise—ranging from initial data collection to final arithmetic processing—and provides standardized rules for representing numbers (significant digits), rounding techniques (Banker's Rounding), and the classification of different error types (Inherent vs. Numerical).\n\n### 🔑 Key Definitions & Terminology\n*   **Exact Numbers:** Values with no uncertainty or approximation (e.g., $2$, $1/3$, or $\\pi$ in its symbolic form).\n*   **Approximate Numbers:** Values used to represent exact numbers with a slight difference (e.g., $3.14$ for $\\pi$).\n*   **Significant Digits (Figures):** The digits in a number that carry meaningful information about its precision.\n*   **Accuracy:** Refers specifically to the **number of significant digits** in a value.\n*   **Precision:** Refers to the **order of magnitude** of the last digit (the decimal position).\n*   **Banker’s Rounding (Gaussian Rounding):** A rounding method where the value is rounded to the nearest **even** number when the digit to be rounded is exactly 5.\n*   **Chopping (Truncation):** The process of simply dropping extra digits beyond a specified limit without adjusting the last retained digit.\n*   **Symmetric Roundoff:** A method where the last retained digit is rounded up if the first discarded digit is $\\ge 5$.\n\n### 🧠 Core Concepts & In-Depth Explanation\n\n#### 1. Rules for Counting Significant Digits\nTo maintain consistency in numerical analysis, the following rules are applied:\n1.  **Non-zero digits:** Always significant.\n2.  **Captive Zeros:** Zeros between non-zero digits are significant (e.g., $105$ has 3).\n3.  **Trailing Zeros (Decimal):** Zeros following a decimal point are significant (e.g., $3.50$ has 3).\n4.  **Leading Zeros:** Zeros between the decimal point and the first non-zero digit are **not** significant (e.g., $0.0012$ has 2).\n5.  **Ambiguity & Scientific Notation:** Trailing zeros without a decimal point (e.g., $4500$) are ambiguous. Use scientific notation to clarify (e.g., $4.5 \\times 10^3$ has 2 digits; $4.500 \\times 10^3$ has 4).\n\n#### 2. Rounding Methodologies\n*   **Banker's Rounding (IEEE 754 Standard):**\n    *   If the $(n+1)^{th}$ digit $< 5$: Leave the $n^{th}$ digit unchanged.\n    *   If the $(n+1)^{th}$ digit $> 5$: Increase the $n^{th}$ digit by 1.\n    *   If the $(n+1)^{th}$ digit $= 5$: Round to the nearest **even** number (if the $n^{th}$ digit is odd, increase it; if even, leave it).\n*   **Chopping vs. Symmetric Roundoff:** Chopping is a \"hard\" cut of digits, while symmetric roundoff considers the value of the discarded digit to decide whether to increment the last kept digit.\n\n#### 3. Taxonomy of Errors\nErrors are categorized based on where they enter the numerical process:\n*   **Inherent Errors (Input Errors):**\n    *   *Data Errors:* Arise from experimental limitations or faulty instrumentation (empirical).\n    *   *Conversion Errors:* Arise because computers cannot store infinite decimals; they only retain a fixed number of digits (representation error).\n*   **Numerical Errors (Procedural Errors):**\n    *   *Roundoff Errors:* Occur at every arithmetic step because numbers are stored with limited precision.\n    *   *Truncation Errors:* (Mentioned as a primary procedural error resulting from the implementation of numerical methods).\n\n### 📝 Quick Revision Points & Formulae\n*   **Accuracy vs. Precision Example:** $57.396$\n    *   Accuracy: 5 significant digits.\n    *   Precision: $0.001$ (or $10^{-3}$).\n*   **Chopping Error Formula:**\n    *   $\\text{Error} = g_x \\times 10^{E-d}$\n    *   *Where:* $d$ = length of the mantissa, $E$ = exponent, $g_x$ = truncated part in normalized form.\n*   **Chopping Absolute Error:** $\\le 10^{E-d}$.\n*   **Banker's Rounding Examples (to 4 digits):**",
+      "original_content_snippet": "--- Page 1 ---\nMSA / L-2                    CSE-4745 - Numerical Methods                     January 18, 2011 \n Page 1 of 5 \nApproximations and Errors in numerical computing \n \nApproximations and errors are an integral part of human life. They are everywhere and \nunavoidable. In numerical methods, w...",
+      "language": "English",
+      "model": "gemma4:12b",
+      "id": "c07e8c7d-c70d-4114-bda7-1235743e779a",
+      "created_at": "2026-10-24T14:49:16.611143",
+      "updated_at": "2026-10-24T14:49:16.611156"
+    },
+    {
+      "title": "Lec-2-Errors in Numerical Computing",
+      "course": "CSE 3515 - Operating Systems",
+      "type": "summary",
       "content": "### 📌 Executive Overview\nThis study material focuses on the fundamental principles of **Approximations and Errors** within the context of Numerical Methods. In numerical computing, errors are unavoidable consequences of representing real-world data and performing arithmetic operations on computers with finite memory. The material categorizes these errors into **Inherent Errors** (related to data input and representation) and **Numerical Errors** (related to the computational process). It also establishes the rigorous rules for identifying **Significant Digits**, distinguishing between **Accuracy and Precision**, and applying specific rounding techniques like **Banker’s Rounding**.\n\n### 🔑 Key Definitions & Terminology\n*   **Exact Number:** A value with no uncertainty or approximation (e.g., $2$, $1/3$, or $\\pi$ in symbolic form).\n*   **Approximate Number:** A value used to represent an exact number, differing only slightly (e.g., $3.14$ for $\\pi$).\n*   **Significant Digits (Figures):** The digits used to express a number. Generally, digits 1–9 are significant; 0 is significant unless it is a leading zero or a placeholder for unknown digits.\n*   **Accuracy:** Refers specifically to the **number of significant digits** in a value.\n*   **Precision:** Refers to the **number of decimal positions** (the order of magnitude of the last digit).\n*   **Banker’s Rounding (Gaussian Rounding):** A rounding method where a value is rounded to the nearest even number to reduce cumulative bias.\n*   **Chopping (Truncation):** The process of simply dropping all digits beyond a specified decimal place or word length.\n*   **Symmetric Roundoff:** A method where the last retained digit is increased by 1 if the first discarded digit is $\\ge 5$.\n\n### 🧠 Core Concepts & In-Depth Explanation\n\n#### 1. Rules for Counting Significant Digits\nTo ensure consistency in numerical analysis, the following rules are applied:\n1.  **Non-zero digits:** Always significant.\n2.  **Captive Zeros:** Zeros between non-zero digits are significant (e.g., $105$ has 3).\n3.  **Trailing Zeros (Decimal):** Zeros following a decimal point are significant (e.g., $3.50$ has 3).\n4.  **Leading Zeros:** Zeros between the decimal point and the first non-zero digit are **not** significant (e.g., $0.001234$ has 4).\n5.  **Ambiguity & Scientific Notation:** Trailing zeros without a decimal point (e.g., $4500$) are ambiguous. Use scientific notation to clarify (e.g., $4.5 \\times 10^3$ has 2 digits; $4.500 \\times 10^3$ has 4).\n\n#### 2. Rounding Methodologies\n*   **Banker’s Rounding Rule:** Used in IEEE Standard 754. To round to $n$ significant digits:\n    *   If the $(n+1)^{th}$ digit $< 5$: Leave the $n^{th}$ digit unchanged.\n    *   If the $(n+1)^{th}$ digit $> 5$: Increase the $n^{th}$ digit by 1.\n    *   If the $(n+1)^{th}$ digit $= 5$: Round to the nearest **even** number (if the $n^{th}$ digit is odd, increase it; if even, leave it).\n\n#### 3. Taxonomy of Errors\nErrors are classified based on where they enter the numerical cycle:\n*   **Inherent Errors (Input):**\n    *   *Data Errors:* Result from experimental limitations or instrumentation inaccuracies.\n    *   *Conversion Errors:* Result from the computer's inability to store infinite decimals (floating-point representation limits).\n*   **Numerical Errors (Procedural):**\n    *   *Roundoff Errors:* Occur at every arithmetic step because the computer stores a finite number of digits.\n    *   *Truncation Errors:* (Mentioned as a procedural error arising during the implementation of numerical methods).\n\n### 📝 Quick Revision Points & Formulae\n*   **Accuracy vs. Precision:**\n    *   $57.396 \\rightarrow$ Accuracy = 5 significant digits.\n    *   $57.396 \\rightarrow$ Precision = $0.001",
       "original_content_snippet": "--- Page 1 ---\nMSA / L-2                    CSE-4745 - Numerical Methods                     January 18, 2011 \n Page 1 of 5 \nApproximations and Errors in numerical computing \n \nApproximations and errors are an integral part of human life. They are everywhere and \nunavoidable. In numerical methods, w...",
       "language": "English",
@@ -180,7 +192,29 @@
       "updated_at": "2026-10-24T14:29:54.928709"
     }
   ],
-  "assessment_results": [],
+  "assessment_results": [
+    {
+      "course": "CSE 3515 - Operating Systems",
+      "topic": "Lec-2-Errors in Numerical Computing",
+      "assessment_type": "quiz",
+      "score": 1,
+      "max_score": 5,
+      "difficulty": "Medium",
+      "details": {
+        "answers": {
+          "1": "A",
+          "2": "D",
+          "3": "B",
+          "4": "D",
+          "5": "B"
+        }
+      },
+      "percentage": 20.0,
+      "id": "3df2cc22-1dd9-4972-8bf3-b7a5ab2f531e",
+      "created_at": "2026-10-24T14:51:16.541057",
+      "updated_at": "2026-10-24T14:51:16.541082"
+    }
+  ],
   "study_goals": [
     {
       "id": "goal-default",

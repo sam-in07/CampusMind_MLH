@@ -112,7 +112,7 @@ Student Dashboard: Faculty and department selection, subject-wise progress, and 
 AI Study Workspace: A generated lecture summary, interactive quiz, or Bangla/English topic explanation.
 Academic Progress: Assessment results, syllabus completion, or the CGPA calculator.
 
-Demo video: <ADD-YOUR-DEMO-VIDEO-LINK>
+Demo video: [<DEMO-VIDEO-LINK>](https://youtu.be/AgpDlIn6BKw)
 
 Screenshots and video links should be added after capturing the actual application. Do not use mockups as evidence of features that are not implemented.
 
