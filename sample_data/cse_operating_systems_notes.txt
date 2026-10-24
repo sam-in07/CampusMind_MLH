@@ -1,0 +1,25 @@
+Operating Systems (CSE 3515) — Lecture 9: Virtual Memory and Demand Paging
+
+1. Overview:
+Virtual memory enables an execution environment where the logical address space is decoupled from physical memory. It allows large applications to run on systems with limited physical RAM and significantly boosts the multiprogramming degree.
+
+2. Demand Paging Architecture:
+- In demand paging, pages are loaded into memory solely when requested by the CPU during instruction execution.
+- The Memory Management Unit (MMU) maintains a page table containing a valid/invalid bit for each page.
+- Valid bit (v): The page is currently mapped to an active physical frame in RAM.
+- Invalid bit (i): The page either does not belong to the process's address space or resides on swap disk.
+
+3. Page Fault Trap Sequence:
+Step 1: CPU attempts to access an address on an invalid page.
+Step 2: Internal hardware traps to the Operating System kernel.
+Step 3: Kernel validates whether the memory reference is legal.
+Step 4: A free physical frame is found from the free-frame pool.
+Step 5: The OS initiates disk I/O to fetch the page from secondary storage.
+Step 6: On I/O completion, the page table is updated, and the bit is set to valid.
+Step 7: The interrupted CPU instruction is restarted seamlessly.
+
+4. Page Replacement Algorithms:
+- FIFO: First-In-First-Out. Suffers from Belady's Anomaly where increasing the number of physical frames increases page fault rate.
+- Optimal: Replaces the page that will not be accessed for the longest time in the future. Serves as a theoretical benchmark.
+- LRU (Least Recently Used): Replaces the page unreferenced for the longest past interval. Approximates optimal without future knowledge.
+- Thrashing: Occurs when the sum of working-set sizes exceeds total available physical frames, causing the CPU to spend near 100% of time handling page faults.

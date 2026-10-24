@@ -1,0 +1,15 @@
+Principles of Islamic Jurisprudence (QSIS 1101) — Principles of Usul al-Fiqh
+
+1. Foundational Sources:
+- The Holy Qur'an: The divine, recited revelation (Wahy Matluw) sent down to Prophet Muhammad (peace be upon him). Definite in authentication (Qat'i al-Thubut).
+- The Prophetic Sunnah: Actions, statements, and tacit consents of the Messenger. Explains and contextualizes the Qur'anic principles.
+
+2. Agreed Secondary Sources:
+- Ijma' (Consensus): The unanimous consensus of the Mujtahid scholars of the Muslim community in an era following the Prophet's death on a legal ruling.
+- Qiyas (Analogical Deduction): Extension of a legal ruling from an established original case (Asl) to a new case (Far') based on the effective cause ('Illah) common to both.
+
+3. Four Pillars of Qiyas:
+- Asl: The original case mentioned in primary texts.
+- Far': The new case requiring a legal ruling.
+- Hukm: The ruling established for the Asl.
+- 'Illah: The underlying ratio decidendi or legal cause.

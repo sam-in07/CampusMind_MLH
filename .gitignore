@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+*.env.local
+
+# Build artifacts
+dist/
+build/
+.vite/
+
+# Temporary and local databases
+data/
+*.log
+*.wav
+*.mp3
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

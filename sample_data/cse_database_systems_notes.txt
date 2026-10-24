@@ -1,0 +1,14 @@
+Database Management Systems (CSE 3521) — Lecture 14: Relational Normalization
+
+1. Objectives of Normalization:
+Normalization minimizes data redundancy, prevents insertion, update, and deletion anomalies, and enforces data integrity across relational tables.
+
+2. Core Normal Forms:
+- First Normal Form (1NF): Every attribute value must be atomic and indivisible. Multi-valued attributes and composite fields are prohibited.
+- Second Normal Form (2NF): Relation must be in 1NF, and no non-prime attribute may exhibit a partial dependency on any candidate key.
+- Third Normal Form (3NF): Relation must be in 2NF, and no non-prime attribute may transitively depend on the primary key (no X -> Y where X is not a superkey and Y is non-prime).
+- Boyce-Codd Normal Form (BCNF): For every non-trivial functional dependency X -> Y, X must be a superkey.
+
+3. Decomposition Criteria:
+- Lossless Join: Natural join of decomposed sub-relations must reconstruct the original relation without creating false (spurious) tuples.
+- Dependency Preservation: Every functional dependency in the original schema must be inferable from the dependencies of the decomposed relations without computing joins.
