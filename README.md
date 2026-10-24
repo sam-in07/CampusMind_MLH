@@ -1,287 +1,154 @@
-# CampusMind — AI-Powered Student Study Assistant for IIUC
+#### CampusMind
 
-> **Tagline:** *Your Department. Your Studies. Your AI.*  
-> **University:** International Islamic University Chittagong (IIUC), Bangladesh  
-> **Target Audience:** Undergraduate and Graduate Students across all 7 IIUC Faculties & Centers  
+Your Department. Your Studies. Your AI.
 
----
+CampusMind is an AI-powered study assistant for students at International Islamic University Chittagong (IIUC), Bangladesh. It helps students summarize lecture materials, generate practice quizzes, understand difficult subjects in Bangla or English, track academic progress, and calculate CGPA.
 
-## 1. Project Overview & Student Problem Solved
+## The problem
 
-At **International Islamic University Chittagong (IIUC)**, students manage demanding academic workloads across diverse disciplines—ranging from Shariah and Islamic Studies to Computer Science, Electrical Engineering, Law, and Business Administration. 
+IIUC students across different faculties face challenges when preparing for examinations. Lecture notes and slides can be lengthy, finding suitable practice questions takes time, and difficult academic topics may require additional explanations in Bangla or English. Students also need a convenient way to track their subject-wise performance and understand their academic progress.
 
-Students often struggle with:
-1. **Synthesizing Extensive Course Materials:** Processing long textbook chapters and lecture notes into concise, actionable revision summaries before exams.
-2. **Quality Self-Assessment:** Practicing relevant, level-appropriate exam questions without having to rely on generic questions from the internet.
-3. **Subject-Specific Explanations:** Needing an academic tutor that understands their specific faculty context, whether it's the 4 Pillars of Qiyas in Shariah or Demand Paging in Operating Systems.
-4. **Accessible Voice Queries:** Asking complex academic questions hands-free using voice in both English and Bangla.
-5. **Separating Realistic Metrics:** Disentangling pure syllabus checklists from actual test performance and transparent exam readiness.
-6. **Determining CGPA Goals:** Accurately calculating cumulative CGPA and modeling future semester scenarios to reach graduation targets.
+Today, students often handle these tasks manually, switch between different tools, and calculate their academic results themselves. CampusMind aims to bring these study activities together in one accessible application.
 
-**CampusMind** solves these challenges by providing a full-stack, responsive study companion powered by local **Gemma 4 12B** running on Ollama, backed by **FastAPI**, **React + Vite**, and **MongoDB Atlas** (with automatic zero-config persistent local storage fallback).
+## The solution
 
----
+CampusMind provides a web-based AI study assistant powered by Gemma 4 12B through Ollama. Students can summarize lecture notes, generate interactive practice quizzes, and ask subject-related questions in Bangla or English. Voice input makes it easier to ask study questions, while the academic dashboard tracks syllabus completion, assessment performance, and estimated exam readiness. A deterministic CGPA calculator also helps students calculate their current CGPA and explore hypothetical future-grade scenarios.
 
-## 2. System Architecture & Request Flow
+How it works
 
-```
-+-------------------------------------------------------------------------+
-|                         React Frontend (Vite)                           |
-|       Tailwind CSS • Recharts • Audio Recording • Cascading Selectors   |
-+------------------------------------+------------------------------------+
-                                     | HTTP Requests (JSON / FormData)
-                                     v
-+------------------------------------+------------------------------------+
-|                         FastAPI Backend                                 |
-|          Pydantic Validation • CORS • PDF Text Extraction (PyPDF)       |
-|          Deterministic CGPA Math • Multi-Factor Readiness Algorithm     |
-+-------------------+-------------------------------+---------------------+
-                    |                               |
-    Ollama HTTP API |                               | PyMongo / Fallback
- (http://localhost:11434)                           |
-                    v                               v
-+-------------------+-------------+   +-------------+---------------------+
-|         Ollama Runtime          |   |       Database Layer              |
-|        Gemma 4 12B Model        |   | • MongoDB Atlas Cluster (Primary) |
-|   (Summarization, MCQs, Tutor)  |   | • Local Persistent JSON (Fallback)|
-+---------------------------------+   +-----------------------------------+
-```
+Model used: Gemma 4 12B — an open-weight AI model served locally through Ollama.
+Model link: https://ollama.com/library/gemma4:12b
+Frontend: React, Vite, Tailwind CSS, Recharts, and Lucide React.
+Backend: Python, FastAPI, Uvicorn, and Pydantic.
+Database: MongoDB Atlas using PyMongo, with persistent local JSON storage as a fallback if implemented and enabled in the application.
+AI integration: The FastAPI backend sends study prompts to the local Ollama API, receives model responses, and returns them to the React frontend.
+Document processing: PyPDF for extracting text from supported PDF documents.
+Voice interaction: Browser microphone and speech-recognition capabilities, with browser speech synthesis for spoken answers, depending on browser support and the implemented workflow.
+Academic analytics: Recharts for visualizing subject-wise progress and Python for deterministic CGPA calculations.
+Datasets: No external dataset is required for the core features. Students can supply their own lecture notes and study materials. Any demonstration records should be fictional or otherwise appropriately authorized.
 
-### Request Flow Security & Privacy:
-* Browser-side React **never** directly accesses Ollama, whisper, or MongoDB credentials.
-* All prompts, data validation, and database operations are executed strictly within the backend.
-* Environment variables keep sensitive Atlas connection strings isolated on the server.
+**How to run it**
+Prerequisites
+Python 3.10 or later.
+Node.js and npm.
+Ollama installed on your computer.
+Gemma 4 12B available in Ollama.
+MongoDB Atlas credentials if cloud database storage is required.
+1. Clone the repository
+git clone <[CampusMind-URL](https://github.com/sam-in07/CampusMind_MLH)>
 
----
+cd CampusMind
 
-## 3. Technology Baseline
 
-| Component | Technology | Version / Specification |
-|:---|:---|:---|
-| **Frontend** | React 19 + Vite | Tailwind CSS v4, Lucide React, Recharts |
-| **Backend** | Python + FastAPI | Uvicorn ASGI, Pydantic v2, PyPDF |
-| **Open-Weight AI** | Gemma 4 12B | Runtime: Ollama (`http://localhost:11434`) |
-| **Voice Input** | Web Audio / SpeechRecognition | Browser Recording + FastAPI Transcription |
-| **Speech Output** | Web Speech Synthesis | Built-in browser TTS with rate/pitch control |
-| **Database** | MongoDB Atlas | PyMongo with automatic zero-config persistent fallback |
+Replace the repository URL with your actual public GitHub repository URL.
 
----
+2. Set up the backend
 
-## 4. Main Features & Supported Workflows
+Open a terminal in the backend directory:
 
-### Feature A: Smart Lecture Summarizer
-* Paste raw lecture notes or upload `.pdf` / `.txt` lecture slides.
-* Extracts document text securely on the backend with character and page validation.
-* Gemma synthesizes structured study sheets:
-  * 📌 Executive Overview
-  * 🔑 Key Definitions & Terminology
-  * 🧠 Core Concepts & In-Depth Explanation
-  * 📝 Quick Revision Points & Formulae
-  * 🎯 Potential Exam Hints
-* Full support for both **English** and **Bangla (বাংলা)**.
-* 1-Click saving to **My Materials** and instant clipboard copying.
-
-### Feature B: Interactive AI Quiz Generator
-* Converts lecture notes into customized practice quizzes.
-* Configurable question count (3, 5, 8, 10) and difficulty (*Easy, Medium, University-Level*).
-* Interactive quiz taking interface with instant score calculation and celebratory confetti.
-* In-depth answer review with explanations for each question.
-* Automatically records quiz attempts into student assessment history.
-
-### Feature C: Department-Tailored AI Topic Explainer
-* Chat study tutor specialized in IIUC academic faculties.
-* Tailors answers according to student's faculty (e.g. citing primary classical sources for Shariah or statutory context for Law).
-* Supports step-by-step solutions, analogies, and practice checks in English and Bangla.
-
-### Feature D: Voice-Based Study Assistant
-* Browser microphone interface with real-time waveform animation and duration timer.
-* Sends recording to `/api/transcribe` for speech-to-text.
-* **Editable Transcription Preview:** Students review or modify recognized text before submitting to Gemma.
-* Listen to AI explanations hands-free using browser Text-to-Speech (TTS).
-
-### Feature E: Academic Progress & Transparent Exam Readiness
-* Tracks three distinct, non-interchangeable indicators:
-  1. **Syllabus Completion %:** Percentage of curriculum topics marked complete.
-  2. **Assessment Performance %:** Actual average score earned on quizzes and tests.
-  3. **Exam Readiness %:** Multi-factor estimated indicator:
-     $$\text{Readiness} = (0.50 \times \text{Syllabus}) + (0.35 \times \text{Assessments}) + (0.15 \times \text{Revision Factor})$$
-* Visual subject-level comparative bar charts and curriculum balance radar chart using **Recharts**.
-
-### Feature F: Deterministic CGPA Calculator & Scenario Simulator
-* Mathematical credit-weighted calculations computed deterministically in Python (no LLM hallucination).
-* Based on standard UGC/IIUC 4.00 grading scale (A+ = 4.00, A = 3.75, A- = 3.50, etc.).
-* **Scenario Simulator:** Lets students enter hypothetical future semester grades to project new cumulative CGPA.
-* **Target CGPA Planner:** Calculates exact required future GPA across planned credits to achieve target honors.
-
-### Feature G: Personalized AI Study Coach
-* Synthesizes recorded quiz attempts, weak topics (< 70% score), and upcoming exam dates.
-* Generates actionable revision schedules and identifies priority improvement areas using Gemma.
-
-### Feature H: My Saved Materials & History
-* Filter saved summaries and quizzes by type, course, and date.
-* Modal reader with search filter and item deletion.
-
----
-
-## 5. IIUC University Structure Supported
-
-CampusMind implements the exact IIUC cascading organizational structure:
-
-1. **Faculty of Shariah and Islamic Studies**
-   * Qur'anic Sciences and Islamic Studies
-   * Da'wah and Islamic Studies
-   * Science of Hadith and Islamic Studies
-2. **Faculty of Science and Engineering**
-   * Computer Science and Engineering
-   * Computer and Communication Engineering
-   * Electrical and Electronic Engineering
-   * Electronic and Telecommunication Engineering
-   * Civil Engineering
-   * Pharmacy
-3. **Faculty of Business Studies**
-   * Business Administration
-   * Department of Finance
-4. **Faculty of Arts and Humanities**
-   * English Language and Literature
-   * Arabic Language and Literature
-   * Library and Information Science
-5. **Faculty of Law**
-   * Department of Law
-6. **Faculty of Social Science**
-   * Economics & Banking
-7. **Center and Institute**
-   * Center for General Education
-
----
-
-## 6. Installation & Running Instructions
-
-### Prerequisites
-* **Node.js** (v18+) & **npm**
-* **Python** (v3.10+)
-* **Ollama** installed with `gemma4:12b` (`ollama pull gemma4:12b`)
-
-### Step 1: Clone and Set Up Environment Variables
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd dfjvbsld
-
-# Configure Backend Environment
-cp backend/.env.example backend/.env
-
-# Configure Frontend Environment
-cp frontend/.env.example frontend/.env
-```
-
-### Step 2: Install Dependencies
-
-```bash
-# Install Python backend dependencies
 cd backend
-python -m pip install -r requirements.txt
-cd ..
+python -m venv venv
 
-# Install Frontend dependencies
+
+Activate the virtual environment on Windows PowerShell:
+
+.\venv\Scripts\Activate.ps1
+
+
+Install the backend dependencies:
+
+python -m pip install -r requirements.txt
+
+
+Configure your environment variables using the provided .env.example, if available. Keep secrets out of GitHub.
+
+3. Start Ollama
+
+Check that the model is installed:
+
+ollama list
+
+
+The expected model identifier is:
+
+gemma4:12b
+
+
+If the model is already installed, you do not need to download it again. Start or open Ollama and ensure its local service is available.
+
+4. Run the backend
+
+From the backend directory, if main.py contains the FastAPI instance named app, run:
+
+python -m uvicorn main:app --reload
+
+
+If the application starts successfully, open the interactive API documentation:
+
+http://127.0.0.1:8000/docs
+
+5. Run the frontend
+
+Open a second terminal:
+
 cd frontend
 npm install
-cd ..
-```
-
-### Step 3: Run Ollama with Gemma 4 12B
-
-Ensure the Ollama service is active:
-```bash
-ollama serve
-# Verify model is available
-ollama list
-```
-
-### Step 4: Run the Backend & Frontend Servers
-
-**Terminal 1 (Backend):**
-```bash
-python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
-```
-
-**Terminal 2 (Frontend):**
-```bash
-cd frontend
 npm run dev
-```
 
-Open your browser at: **`http://localhost:5173`**
 
----
+Open the local URL printed by Vite, typically:
 
-## 7. MongoDB Atlas Configuration
+http://localhost:5173
 
-By default, CampusMind runs in **Zero-Config Persistent Local Mode** (`backend/data/campusmind_db.json`), allowing judges and developers to test all features immediately without entering credentials.
+Note: These commands assume your repository contains the described files and that the dependencies and endpoints have been implemented. Adjust the commands to match your actual project structure.
 
-To connect to your cloud **MongoDB Atlas** cluster:
-1. Create a cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
-2. Create a database named `campusmind`.
-3. Open `backend/.env` and paste your URI:
-   ```env
-   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority
-   MONGODB_DATABASE=campusmind
-   ```
-4. Restart the backend. CampusMind will automatically detect the connection, log `Successfully connected to MongoDB Atlas`, and update the UI indicator badge to **Atlas DB**.
+Screenshots / demo
 
----
+Add screenshots or a short demo video showing the actual working application.
 
-## 8. API Endpoint Documentation
+Recommended screenshots:
 
-| Method | Endpoint | Description |
-|:---|:---|:---|
-| `GET` | `/api/health` | Backend status and database persistence mode |
-| `GET` | `/api/health/ai` | Ollama connectivity & Gemma model verification |
-| `GET` | `/api/faculties` | Complete list of 7 IIUC faculties and departments |
-| `GET` | `/api/courses` | Available courses filtered by department/semester |
-| `POST` | `/api/summarize` | Generate structured study notes from text or uploads |
-| `POST` | `/api/generate-quiz` | Generate validated MCQs and explanations |
-| `POST` | `/api/explain` | AI topic explainer tailored to department |
-| `POST` | `/api/documents/extract` | Extract text and page counts from PDF/TXT files |
-| `POST` | `/api/transcribe` | Speech-to-text audio transcription endpoint |
-| `POST` | `/api/voice/explain` | Voice query explainer with TTS audio |
-| `POST` | `/api/recommendations` | Generate AI study recommendations from test history |
-| `POST` | `/api/materials` | Save study material or lecture notes |
-| `GET` | `/api/materials` | List saved materials with filtering |
-| `DELETE` | `/api/materials/{id}` | Delete a saved material |
-| `POST` | `/api/assessments` | Record quiz or mock exam attempt score |
-| `GET` | `/api/assessments` | Retrieve quiz attempt records |
-| `GET` | `/api/progress` | Subject-wise progress, syllabus %, and exam readiness |
-| `GET` | `/api/history` | Study activity audit log |
-| `POST` | `/api/cgpa/calculate` | Deterministic CGPA computation |
-| `POST` | `/api/cgpa/project` | Scenario projection & target required GPA analysis |
-| `GET` | `/api/profile` | Retrieve student profile and preferences |
-| `PUT` | `/api/profile` | Update faculty, department, semester, and language |
+Student Dashboard: Faculty and department selection, subject-wise progress, and exam-readiness indicators.
+AI Study Workspace: A generated lecture summary, interactive quiz, or Bangla/English topic explanation.
+Academic Progress: Assessment results, syllabus completion, or the CGPA calculator.
 
-Interactive Swagger documentation is available at **`http://localhost:8000/docs`**.
+Demo video: <ADD-YOUR-DEMO-VIDEO-LINK>
 
----
+Screenshots and video links should be added after capturing the actual application. Do not use mockups as evidence of features that are not implemented.
 
-## 9. Model Verification & Licensing
+## What's not done yet
 
-* **Model:** Gemma 4 12B
-* **Runtime:** Ollama (Local open-weight deployment)
-* **Model Identifier:** `gemma4:12b`
-* **Licence:** Gemma Terms of Use (Google open model weights)
-* **Official Model Library:** [https://ollama.com/library/gemma4:12b](https://ollama.com/library/gemma4:12b)
+The following items should be updated to reflect the actual state of the submitted application:
 
----
+Official IIUC course materials and past examination questions are not automatically available unless a verified collection has been integrated.
+Exam-readiness indicators are estimates based on available study and assessment data; they do not guarantee examination results.
+CGPA projections depend on correct credit hours and a verified grading scale.
+Authentication and secure multi-student data isolation require appropriate implementation before real student records are used.
+Voice recognition depends on the supported browser capabilities and the configured speech-recognition workflow.
+Scanned PDFs without extractable text require OCR support, which may not be implemented.
+Cloud MongoDB persistence depends on valid configuration and a successful database connection.
 
-## 10. Known Limitations & Future Work
+Remove any items that have been completed, and add actual known bugs or missing features before submission.
 
-* **Scanned Image PDFs:** PDFs consisting entirely of scanned raster images without OCR text layers return a helpful user error recommending text-based PDFs or pasted notes.
-* **University Authentication:** For this hackathon/competition demonstration, a sample student profile (`C231001`) is initialized with realistic demonstration records. Full SSO integration with IIUC student portal (e.g., student.iiuc.ac.bd) is planned for future institutional deployment.
-* **Voice Cloud Quality:** Local SpeechRecognition uses standard web speech protocols; optional cloud ElevenLabs TTS can be configured via backend `.env` for ultra-realistic voice cloning.
+## Credits
+Google DeepMind / Google: Gemma open-weight model and applicable model terms — https://ollama.com/library/gemma4:12b
 
----
+Ollama: Local model runtime and API — https://ollama.com/
 
-## 11. Credits & Acknowledgements
+React: https://react.dev/
 
-* **IIUC Administration & Faculty:** For the curriculum structure and academic grading standards.
-* **Google DeepMind / Gemma Team:** For the Gemma open-weight foundation models.
-* **Ollama Community:** For the high-performance local inference runtime.
+Vite: https://vite.dev/
+
+Tailwind CSS: https://tailwindcss.com/
+
+FastAPI: https://fastapi.tiangolo.com/
+
+MongoDB: https://www.mongodb.com/
+
+PyMongo: https://pymongo.readthedocs.io/
+
+Recharts: https://recharts.org/
+
+PyPDF: https://pypdf.readthedocs.io/
+
+Additional tutorials, starter templates, code snippets, and contributors should be credited here as applicable.

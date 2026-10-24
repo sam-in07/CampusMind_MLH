@@ -2,15 +2,15 @@
   "student_profiles": [
     {
       "id": "student-default",
-      "student_id": "C231001",
+      "student_id": "C233152",
       "faculty": "Faculty of Science and Engineering",
       "department": "Computer Science and Engineering",
-      "semester": "5th Semester",
+      "semester": "7th Semester",
       "preferred_language": "English",
-      "name": "IIUC Student",
-      "email": "student@iiuc.ac.bd",
+      "name": "Samin Ahmed  chowdhury",
+      "email": "c233152@iiuc.ac.bd",
       "created_at": "2026-10-24T13:37:13.599117",
-      "updated_at": "2026-10-24T13:37:13.599131"
+      "updated_at": "2026-10-24T14:09:25.061707"
     }
   ],
   "study_materials": [],
