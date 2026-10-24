@@ -30,6 +30,82 @@
   "summaries": [],
   "quizzes": [
     {
+      "course": "CSE 3515 - Operating Systems",
+      "num_questions": 5,
+      "difficulty": "Medium",
+      "language": "English",
+      "questions": [
+        {
+          "id": 1,
+          "question": "According to the rules of significant digits, how many significant figures are present in the value 0.0001234?",
+          "type": "mcq",
+          "options": [
+            "A) 7",
+            "B) 8",
+            "C) 4",
+            "D) 3"
+          ],
+          "correct_answer": "C",
+          "explanation": "Zeros between the decimal point and preceding a non-zero digit are non-significant. Therefore, only the digits 1, 2, 3, and 4 are significant."
+        },
+        {
+          "id": 2,
+          "question": "A numerical value is given as 57.396. Based on the provided notes, what is the precision of this value?",
+          "type": "mcq",
+          "options": [
+            "A) 5",
+            "B) 0.001",
+            "C) 10^-3",
+            "D) Both B and C"
+          ],
+          "correct_answer": "D",
+          "explanation": "Precision refers to the order of magnitude of the last digit in a value. For 57.396, the last digit is in the thousandths place, which corresponds to 0.001 or 10^-3."
+        },
+        {
+          "id": 3,
+          "question": "Which of the following representations of the number 4500 clearly indicates that it has exactly two significant digits?",
+          "type": "mcq",
+          "options": [
+            "A) 4500",
+            "B) 4500.0",
+            "C) 45 x 10^2",
+            "D) 4500.00"
+          ],
+          "correct_answer": "C",
+          "explanation": "When the decimal point is not written, trailing zeros are ambiguous. Using scientific notation (45 x 10^2) clarifies that there are only two significant digits."
+        },
+        {
+          "id": 4,
+          "question": "Which of the following is classified as an 'exact number' in the context of numerical computing as described in the notes?",
+          "type": "mcq",
+          "options": [
+            "A) 3.14",
+            "B) 0.333",
+            "C) sqrt(2)",
+            "D) 1.5"
+          ],
+          "correct_answer": "C",
+          "explanation": "The notes state that sqrt(2) is an exact number when written in its symbolic form because there is no approximation or uncertainty associated with that specific notation."
+        },
+        {
+          "id": 5,
+          "question": "If the number 3.14159265 is rounded to the nearest thousandth, what is the resulting value?",
+          "type": "mcq",
+          "options": [
+            "A) 3.14",
+            "B) 3.142",
+            "C) 3.1416",
+            "D) 3.1"
+          ],
+          "correct_answer": "A",
+          "explanation": "Rounding to the nearest thousandth means looking at the third decimal place. The digit in the fourth decimal place is 1, so the third decimal place (4) remains unchanged."
+        }
+      ],
+      "id": "d543dda3-f708-4972-bbe9-b4faa1a88373",
+      "created_at": "2026-10-24T14:43:53.714347",
+      "updated_at": "2026-10-24T14:43:53.714361"
+    },
+    {
       "course": "General",
       "num_questions": 2,
       "difficulty": "Easy",
