@@ -1,0 +1,41 @@
+{
+  "student_profiles": [
+    {
+      "id": "student-default",
+      "student_id": "C231001",
+      "faculty": "Faculty of Science and Engineering",
+      "department": "Computer Science and Engineering",
+      "semester": "5th Semester",
+      "preferred_language": "English",
+      "name": "IIUC Student",
+      "email": "student@iiuc.ac.bd",
+      "created_at": "2026-10-24T13:37:13.599117",
+      "updated_at": "2026-10-24T13:37:13.599131"
+    }
+  ],
+  "study_materials": [],
+  "summaries": [],
+  "quizzes": [],
+  "assessment_results": [],
+  "study_goals": [
+    {
+      "id": "goal-default",
+      "target_cgpa": 3.75,
+      "target_study_hours": 20,
+      "completed_study_hours": 14,
+      "upcoming_exams": [
+        {
+          "course": "CSE 3515 - Operating Systems",
+          "date": "2026-11-15",
+          "topics": "Memory Management & Paging"
+        },
+        {
+          "course": "CSE 3521 - Database Systems",
+          "date": "2026-11-22",
+          "topics": "Normalization & Transactions"
+        }
+      ]
+    }
+  ],
+  "study_history": []
+}
