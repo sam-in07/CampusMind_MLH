@@ -98,13 +98,10 @@ async def explain_topic(req: ExplainRequest):
 @router.post("/documents/extract")
 async def extract_document(file: UploadFile = File(...)):
     """Extract clean text and metadata from uploaded PDF or TXT file."""
-    text, pages = await DocumentService.extract_text(file)
+    result = await DocumentService.extract_text(file)
     return {
-        "status": "success",
-        "filename": file.filename,
-        "page_count": pages,
-        "char_count": len(text),
-        "extracted_text": text
+        "status": "success" if result.get("has_text") else "warning",
+        **result
     }
 
 @router.post("/transcribe")

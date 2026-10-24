@@ -15,7 +15,7 @@ class Settings(BaseModel):
     # Ollama AI Configuration
     OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
     OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "gemma4:12b")
-    OLLAMA_TIMEOUT: float = float(os.getenv("OLLAMA_TIMEOUT", "120.0"))
+    OLLAMA_TIMEOUT: float = float(os.getenv("OLLAMA_TIMEOUT", "180.0"))
     
     # MongoDB Configuration
     MONGODB_URI: str = os.getenv("MONGODB_URI", "")

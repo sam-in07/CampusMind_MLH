@@ -16,10 +16,13 @@ import {
   RotateCcw,
   Languages,
   BookmarkCheck,
-  FileText
+  FileText,
+  FileCheck2,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { api } from "../services/api";
-import { SAMPLE_LECTURE_NOTES, IIUC_FACULTIES } from "../data/iiucData";
+import { SAMPLE_LECTURE_NOTES } from "../data/iiucData";
 import AudioRecorder from "../components/AudioRecorder";
 
 export default function StudyWorkspacePage({ studentProfile }) {
@@ -28,16 +31,18 @@ export default function StudyWorkspacePage({ studentProfile }) {
 
   // Summarizer State
   const [summaryInput, setSummaryInput] = useState("");
-  const [summaryTitle, setSummaryTitle] = useState("Operating Systems — Virtual Memory");
+  const [summaryTitle, setSummaryTitle] = useState("Operating Systems — Demand Paging");
   const [summaryCourse, setSummaryCourse] = useState("CSE 3515 - Operating Systems");
   const [summaryOutput, setSummaryOutput] = useState("");
   const [summarizing, setSummarizing] = useState(false);
   const [summarySaved, setSummarySaved] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [uploadedFileInfo, setUploadedFileInfo] = useState(null);
   const [copiedSummary, setCopiedSummary] = useState(false);
 
   // Quiz State
   const [quizInput, setQuizInput] = useState("");
+  const [showQuizSource, setShowQuizSource] = useState(false);
   const [quizNum, setQuizNum] = useState(5);
   const [quizDifficulty, setQuizDifficulty] = useState("Medium");
   const [generatingQuiz, setGeneratingQuiz] = useState(false);
@@ -68,27 +73,48 @@ export default function StudyWorkspacePage({ studentProfile }) {
       setSummaryCourse(sample.course);
       setSummaryInput(sample.text);
       setQuizInput(sample.text);
+      setUploadedFileInfo({
+        filename: `${key.toUpperCase()}_Lecture_Notes.txt`,
+        page_count: 1,
+        char_count: sample.text.length,
+        has_text: true,
+        message: "Sample lecture notes loaded successfully."
+      });
+      setErrorMsg("");
     }
   };
 
   // Handler: Document Upload (PDF / TXT)
   const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     setUploadingDoc(true);
     setErrorMsg("");
+    setUploadedFileInfo(null);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
       const res = await api.extractDocument(formData);
-      setSummaryInput(res.extracted_text);
-      setQuizInput(res.extracted_text);
-      setSummaryTitle(file.name.replace(/\.[^/.]+$/, ""));
+
+      if (res.has_text && res.extracted_text) {
+        setSummaryInput(res.extracted_text);
+        setQuizInput(res.extracted_text);
+        setSummaryTitle(file.name.replace(/\.[^/.]+$/, ""));
+        setUploadedFileInfo(res);
+      } else {
+        setUploadedFileInfo(res);
+        setErrorMsg(
+          res.message || "This PDF contains no selectable text layer (likely a scanned image). Please paste lecture notes directly."
+        );
+      }
     } catch (err) {
       setErrorMsg(`Document extraction error: ${err.message}`);
     } finally {
       setUploadingDoc(false);
+      // Reset input so re-uploading the same file triggers onChange
+      e.target.value = "";
     }
   };
 
@@ -121,7 +147,7 @@ export default function StudyWorkspacePage({ studentProfile }) {
   const handleGenerateQuiz = async () => {
     const content = quizInput.trim() || summaryInput.trim();
     if (!content || content.length < 10) {
-      setErrorMsg("Please provide source lecture notes to generate quiz questions from.");
+      setErrorMsg("Please provide source lecture notes (or click 'Load Sample Notes' / 'Upload PDF') to generate quiz questions.");
       return;
     }
     setGeneratingQuiz(true);
@@ -136,7 +162,11 @@ export default function StudyWorkspacePage({ studentProfile }) {
         language: language,
         course: summaryCourse
       });
-      setQuizQuestions(res.questions);
+      if (res.questions && res.questions.length > 0) {
+        setQuizQuestions(res.questions);
+      } else {
+        throw new Error("No questions were returned. Please try with sample notes.");
+      }
     } catch (err) {
       setErrorMsg(`Quiz generation failed: ${err.message}`);
     } finally {
@@ -158,7 +188,6 @@ export default function StudyWorkspacePage({ studentProfile }) {
     let score = 0;
     quizQuestions.forEach((q) => {
       const selected = userAnswers[q.id];
-      // Check if selected matches correct_answer (e.g. "A" or option starting with "A")
       if (selected && (selected === q.correct_answer || q.correct_answer.startsWith(selected))) {
         score += 1;
       }
@@ -167,14 +196,12 @@ export default function StudyWorkspacePage({ studentProfile }) {
     setQuizScore(score);
     setQuizSubmitted(true);
 
-    // Trigger celebratory confetti for high scores!
     if (score / quizQuestions.length >= 0.7) {
       try {
         confetti({ particleCount: 75, spread: 60, origin: { y: 0.6 } });
       } catch {}
     }
 
-    // Automatically record to database assessments
     try {
       await api.recordAssessment({
         course: summaryCourse,
@@ -296,16 +323,35 @@ export default function StudyWorkspacePage({ studentProfile }) {
         })}
       </div>
 
-      {/* Global Error Banner if any */}
+      {/* Global Error Banner */}
       {errorMsg && (
-        <div className="flex items-center justify-between p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs shadow-lg animate-fadeIn">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
             <span>{errorMsg}</span>
           </div>
-          <button onClick={() => setErrorMsg("")} className="text-amber-400 hover:underline">
+          <button onClick={() => setErrorMsg("")} className="text-amber-400 hover:underline font-semibold ml-4">
             Dismiss
           </button>
+        </div>
+      )}
+
+      {/* Upload Status Banner if any */}
+      {uploadedFileInfo && (
+        <div className={`flex items-center justify-between p-3 rounded-xl border text-xs ${
+          uploadedFileInfo.has_text
+            ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+            : "bg-amber-500/10 border-amber-500/30 text-amber-300"
+        }`}>
+          <div className="flex items-center gap-2">
+            <FileCheck2 className="w-4 h-4 shrink-0" />
+            <span>
+              <strong>{uploadedFileInfo.filename}</strong>: {uploadedFileInfo.page_count} pages, {uploadedFileInfo.char_count} characters extracted.
+            </span>
+          </div>
+          <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-900">
+            {uploadedFileInfo.has_text ? "Ready for AI Analysis" : "No Embedded Text Layer"}
+          </span>
         </div>
       )}
 
@@ -324,19 +370,19 @@ export default function StudyWorkspacePage({ studentProfile }) {
                 <span className="text-slate-500">Quick Samples:</span>
                 <button
                   onClick={() => loadSample("os")}
-                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 font-medium"
+                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 font-medium transition"
                 >
                   OS
                 </button>
                 <button
                   onClick={() => loadSample("db")}
-                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 font-medium"
+                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 font-medium transition"
                 >
                   Database
                 </button>
                 <button
                   onClick={() => loadSample("shariah")}
-                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 font-medium"
+                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-400 font-medium transition"
                 >
                   Shariah
                 </button>
@@ -372,17 +418,20 @@ export default function StudyWorkspacePage({ studentProfile }) {
               <textarea
                 rows={10}
                 value={summaryInput}
-                onChange={(e) => setSummaryInput(e.target.value)}
-                placeholder="Paste your lecture notes, textbook excerpts, or discussion points here..."
+                onChange={(e) => {
+                  setSummaryInput(e.target.value);
+                  setQuizInput(e.target.value);
+                }}
+                placeholder="Paste your lecture notes, textbook excerpts, or click 'Upload PDF / TXT Notes' below..."
                 className="w-full bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/60 leading-relaxed font-sans"
               />
             </div>
 
             {/* Document Upload Button */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-              <label className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 text-xs font-medium border border-slate-700 transition">
+              <label className="w-full sm:w-auto cursor-pointer flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition">
                 <Upload className="w-3.5 h-3.5 text-cyan-400" />
-                <span>{uploadingDoc ? "Extracting text..." : "Upload PDF / TXT Notes"}</span>
+                <span>{uploadingDoc ? "Extracting document..." : "Upload PDF / TXT Notes"}</span>
                 <input
                   type="file"
                   accept=".pdf,.txt"
@@ -438,7 +487,17 @@ export default function StudyWorkspacePage({ studentProfile }) {
             </div>
 
             <div className="flex-1 bg-slate-950/80 rounded-xl p-4 border border-slate-800/80 overflow-y-auto max-h-[500px]">
-              {summaryOutput ? (
+              {summarizing ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-8 space-y-3">
+                  <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+                  <p className="text-xs font-semibold text-slate-300">
+                    Gemma 4 12B is reading and structuring your lecture material...
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    Generating Executive Overview, Core Terminology, and Revision Takeaways
+                  </p>
+                </div>
+              ) : summaryOutput ? (
                 <div className="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
                   {summaryOutput}
                 </div>
@@ -471,7 +530,6 @@ export default function StudyWorkspacePage({ studentProfile }) {
                   <option value={3}>3 Questions</option>
                   <option value={5}>5 Questions</option>
                   <option value={8}>8 Questions</option>
-                  <option value={10}>10 Questions</option>
                 </select>
               </div>
 
@@ -488,40 +546,99 @@ export default function StudyWorkspacePage({ studentProfile }) {
                 </select>
               </div>
 
+              {/* Upload directly for Quiz */}
               <div>
-                <label className="text-slate-400 font-semibold block mb-1">Source Material:</label>
+                <label className="text-slate-400 font-semibold block mb-1">Upload Notes / PDF:</label>
+                <label className="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition">
+                  <Upload className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>{uploadingDoc ? "Extracting..." : "Upload Notes"}</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.txt"
+                    onChange={handleFileUpload}
+                    disabled={uploadingDoc}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <div>
+                <label className="text-slate-400 font-semibold block mb-1">Quick Sample:</label>
                 <button
                   onClick={() => loadSample("os")}
                   className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-400 font-medium"
                 >
-                  Load Sample Notes
+                  Load OS Sample
                 </button>
               </div>
             </div>
 
-            <button
-              onClick={handleGenerateQuiz}
-              disabled={generatingQuiz}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-400 hover:to-cyan-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 transition flex items-center gap-2 disabled:opacity-40"
-            >
-              {generatingQuiz ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Generating MCQs with Gemma...</span>
-                </>
-              ) : (
-                <>
-                  <HelpCircle className="w-3.5 h-3.5" />
-                  <span>Generate Practice Quiz</span>
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowQuizSource(!showQuizSource)}
+                className="text-xs text-slate-400 hover:text-white flex items-center gap-1"
+              >
+                <span>Source Text ({quizInput.length} chars)</span>
+                {showQuizSource ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+
+              <button
+                onClick={handleGenerateQuiz}
+                disabled={generatingQuiz || (!quizInput.trim() && !summaryInput.trim())}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-400 hover:to-cyan-500 text-white text-xs font-bold shadow-lg shadow-emerald-500/20 transition flex items-center gap-2 disabled:opacity-40"
+              >
+                {generatingQuiz ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Generating with Gemma...</span>
+                  </>
+                ) : (
+                  <>
+                    <HelpCircle className="w-3.5 h-3.5" />
+                    <span>Generate Practice Quiz</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
+          {/* Collapsible Source Text Area */}
+          {showQuizSource && (
+            <div className="glass-card rounded-2xl p-4 border border-slate-800 space-y-2 animate-fadeIn">
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>Lecture Notes Source for Quiz Generation:</span>
+                <span>{quizInput.length} characters</span>
+              </div>
+              <textarea
+                rows={5}
+                value={quizInput}
+                onChange={(e) => setQuizInput(e.target.value)}
+                placeholder="Paste or edit the notes from which the quiz will be created..."
+                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-cyan-500"
+              />
+            </div>
+          )}
+
+          {/* Prominent Loading Card when generating */}
+          {generatingQuiz && (
+            <div className="glass-card rounded-2xl p-10 border border-cyan-500/30 text-center space-y-4 bg-slate-950/60 animate-pulse">
+              <Loader2 className="w-10 h-10 text-cyan-400 animate-spin mx-auto" />
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-white">Gemma 4 12B is Crafting Your Quiz</h3>
+                <p className="text-xs text-slate-300">
+                  Formulating {quizNum} practice questions with verified options and detailed academic explanations...
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Running local open-weight inference (~10-20 seconds)
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Quiz Taking Interface */}
-          {quizQuestions.length > 0 ? (
+          {!generatingQuiz && quizQuestions.length > 0 && (
             <div className="space-y-6">
-              {/* Question list */}
               {quizQuestions.map((q, idx) => {
                 const userChoice = userAnswers[q.id];
                 const isCorrect = userChoice && (userChoice === q.correct_answer || q.correct_answer.startsWith(userChoice));
@@ -558,9 +675,9 @@ export default function StudyWorkspacePage({ studentProfile }) {
                     {/* Options */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {q.options?.map((opt, oIdx) => {
-                        const optLetter = opt.charAt(0);
+                        const optLetter = opt.trim().charAt(0).toUpperCase();
                         const isSelected = userChoice === optLetter;
-                        const isTheCorrectAnswer = q.correct_answer.startsWith(optLetter);
+                        const isTheCorrectAnswer = q.correct_answer.trim().startsWith(optLetter);
 
                         let optClasses = "bg-slate-950/70 border-slate-800 text-slate-300 hover:border-slate-700";
                         if (quizSubmitted) {
@@ -580,7 +697,7 @@ export default function StudyWorkspacePage({ studentProfile }) {
                             onClick={() => handleSelectOption(q.id, optLetter)}
                             className={`p-3 rounded-xl border text-left text-xs transition flex items-center gap-2 ${optClasses}`}
                           >
-                            <span className="w-5 h-5 rounded-md bg-slate-800 flex items-center justify-center font-bold text-[10px]">
+                            <span className="w-5 h-5 rounded-md bg-slate-800 flex items-center justify-center font-bold text-[10px] shrink-0">
                               {optLetter}
                             </span>
                             <span>{opt.slice(3) || opt}</span>
@@ -616,7 +733,7 @@ export default function StudyWorkspacePage({ studentProfile }) {
                   </div>
                 ) : (
                   <p className="text-xs text-slate-400">
-                    Answer all questions above and click submit to evaluate your mastery.
+                    Select your answers above and click submit to evaluate your test mastery.
                   </p>
                 )}
 
@@ -645,12 +762,14 @@ export default function StudyWorkspacePage({ studentProfile }) {
                 </div>
               </div>
             </div>
-          ) : (
+          )}
+
+          {!generatingQuiz && quizQuestions.length === 0 && (
             <div className="glass-card rounded-2xl p-12 text-center border border-slate-800 space-y-3">
               <HelpCircle className="w-12 h-12 text-slate-700 mx-auto" />
-              <h3 className="text-base font-bold text-white">No Quiz Generated Yet</h3>
+              <h3 className="text-base font-bold text-white">No Quiz Questions Generated Yet</h3>
               <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Paste your lecture notes into the input box or click "Load Sample Notes", then press "Generate Practice Quiz".
+                Click <strong>"Load OS Sample"</strong> or <strong>"Upload Notes"</strong> above, then press <strong>"Generate Practice Quiz"</strong>.
               </p>
             </div>
           )}
@@ -743,7 +862,6 @@ export default function StudyWorkspacePage({ studentProfile }) {
           department={studentProfile?.department}
           course={summaryCourse}
           onQuestionSubmit={(q, a) => {
-            // Append to explainer chat history as well
             setChatHistory((prev) => [
               ...prev,
               { role: "user", content: `[Voice]: ${q}` },

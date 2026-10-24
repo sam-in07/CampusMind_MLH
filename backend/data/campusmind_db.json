@@ -13,9 +13,97 @@
       "updated_at": "2026-10-24T14:09:25.061707"
     }
   ],
-  "study_materials": [],
+  "study_materials": [
+    {
+      "title": "Lec-2-Errors in Numerical Computing",
+      "course": "CSE 3515 - Operating Systems",
+      "type": "summary",
+      "content": "### 📌 Executive Overview\nThis study material focuses on the fundamental principles of **Approximations and Errors** within the context of Numerical Methods. In numerical computing, errors are unavoidable consequences of representing real-world data and performing arithmetic operations on computers with finite memory. The material categorizes these errors into **Inherent Errors** (related to data input and representation) and **Numerical Errors** (related to the computational process). It also establishes the rigorous rules for identifying **Significant Digits**, distinguishing between **Accuracy and Precision**, and applying specific rounding techniques like **Banker’s Rounding**.\n\n### 🔑 Key Definitions & Terminology\n*   **Exact Number:** A value with no uncertainty or approximation (e.g., $2$, $1/3$, or $\\pi$ in symbolic form).\n*   **Approximate Number:** A value used to represent an exact number, differing only slightly (e.g., $3.14$ for $\\pi$).\n*   **Significant Digits (Figures):** The digits used to express a number. Generally, digits 1–9 are significant; 0 is significant unless it is a leading zero or a placeholder for unknown digits.\n*   **Accuracy:** Refers specifically to the **number of significant digits** in a value.\n*   **Precision:** Refers to the **number of decimal positions** (the order of magnitude of the last digit).\n*   **Banker’s Rounding (Gaussian Rounding):** A rounding method where a value is rounded to the nearest even number to reduce cumulative bias.\n*   **Chopping (Truncation):** The process of simply dropping all digits beyond a specified decimal place or word length.\n*   **Symmetric Roundoff:** A method where the last retained digit is increased by 1 if the first discarded digit is $\\ge 5$.\n\n### 🧠 Core Concepts & In-Depth Explanation\n\n#### 1. Rules for Counting Significant Digits\nTo ensure consistency in numerical analysis, the following rules are applied:\n1.  **Non-zero digits:** Always significant.\n2.  **Captive Zeros:** Zeros between non-zero digits are significant (e.g., $105$ has 3).\n3.  **Trailing Zeros (Decimal):** Zeros following a decimal point are significant (e.g., $3.50$ has 3).\n4.  **Leading Zeros:** Zeros between the decimal point and the first non-zero digit are **not** significant (e.g., $0.001234$ has 4).\n5.  **Ambiguity & Scientific Notation:** Trailing zeros without a decimal point (e.g., $4500$) are ambiguous. Use scientific notation to clarify (e.g., $4.5 \\times 10^3$ has 2 digits; $4.500 \\times 10^3$ has 4).\n\n#### 2. Rounding Methodologies\n*   **Banker’s Rounding Rule:** Used in IEEE Standard 754. To round to $n$ significant digits:\n    *   If the $(n+1)^{th}$ digit $< 5$: Leave the $n^{th}$ digit unchanged.\n    *   If the $(n+1)^{th}$ digit $> 5$: Increase the $n^{th}$ digit by 1.\n    *   If the $(n+1)^{th}$ digit $= 5$: Round to the nearest **even** number (if the $n^{th}$ digit is odd, increase it; if even, leave it).\n\n#### 3. Taxonomy of Errors\nErrors are classified based on where they enter the numerical cycle:\n*   **Inherent Errors (Input):**\n    *   *Data Errors:* Result from experimental limitations or instrumentation inaccuracies.\n    *   *Conversion Errors:* Result from the computer's inability to store infinite decimals (floating-point representation limits).\n*   **Numerical Errors (Procedural):**\n    *   *Roundoff Errors:* Occur at every arithmetic step because the computer stores a finite number of digits.\n    *   *Truncation Errors:* (Mentioned as a procedural error arising during the implementation of numerical methods).\n\n### 📝 Quick Revision Points & Formulae\n*   **Accuracy vs. Precision:**\n    *   $57.396 \\rightarrow$ Accuracy = 5 significant digits.\n    *   $57.396 \\rightarrow$ Precision = $0.001",
+      "original_content_snippet": "--- Page 1 ---\nMSA / L-2                    CSE-4745 - Numerical Methods                     January 18, 2011 \n Page 1 of 5 \nApproximations and Errors in numerical computing \n \nApproximations and errors are an integral part of human life. They are everywhere and \nunavoidable. In numerical methods, w...",
+      "language": "English",
+      "model": "gemma4:12b",
+      "id": "128af5fd-e39b-4199-b211-8f22e97f761b",
+      "created_at": "2026-10-24T14:40:23.249222",
+      "updated_at": "2026-10-24T14:40:23.249229"
+    }
+  ],
   "summaries": [],
-  "quizzes": [],
+  "quizzes": [
+    {
+      "course": "General",
+      "num_questions": 2,
+      "difficulty": "Easy",
+      "language": "English",
+      "questions": [
+        {
+          "id": 1,
+          "question": "How many significant digits are present in the measurement 0.001234?",
+          "type": "mcq",
+          "options": [
+            "A) 4",
+            "B) 7",
+            "C) 3",
+            "D) 6"
+          ],
+          "correct_answer": "A",
+          "explanation": "In the measurement 0.001234, the leading zeros are not counted as significant digits. Only the digits 1, 2, 3, and 4 are significant, resulting in a total of 4 significant digits."
+        },
+        {
+          "id": 2,
+          "question": "What is the correct scientific notation for the measurement 0.001234?",
+          "type": "mcq",
+          "options": [
+            "A) 1.234 x 10^-3",
+            "B) 1.234 x 10^3",
+            "C) 12.34 x 10^-4",
+            "D) 0.1234 x 10^-2"
+          ],
+          "correct_answer": "A",
+          "explanation": "To convert 0.001234 into scientific notation, the decimal point is moved 3 places to the right to create a number between 1 and 10 (1.234), which corresponds to the power of 10^-3."
+        }
+      ],
+      "id": "35ae905f-530a-46c1-b04c-ee9fbf108fb1",
+      "created_at": "2026-10-24T14:30:48.698749",
+      "updated_at": "2026-10-24T14:30:48.698759"
+    },
+    {
+      "course": "General",
+      "num_questions": 2,
+      "difficulty": "Easy",
+      "language": "English",
+      "questions": [
+        {
+          "id": 1,
+          "question": "How many significant digits are in the measurement 0.001234?",
+          "type": "mcq",
+          "options": [
+            "A) 4",
+            "B) 7",
+            "C) 3",
+            "D) 1"
+          ],
+          "correct_answer": "A",
+          "explanation": "In the measurement 0.001234, the leading zeros are not significant. Only the digits 1, 2, 3, and 4 are counted as significant digits."
+        },
+        {
+          "id": 2,
+          "question": "What is the correct scientific notation for the measurement 0.001234?",
+          "type": "mcq",
+          "options": [
+            "A) 1.234 x 10^-3",
+            "B) 1.234 x 10^3",
+            "C) 12.34 x 10^-4",
+            "D) 0.1234 x 10^-2"
+          ],
+          "correct_answer": "A",
+          "explanation": "To express 0.001234 in scientific notation, the decimal point is moved 3 places to the right, resulting in 1.234 x 10^-3."
+        }
+      ],
+      "id": "eaf4feb4-ee1f-431b-85da-d3fcd54af4e5",
+      "created_at": "2026-10-24T14:29:54.928702",
+      "updated_at": "2026-10-24T14:29:54.928709"
+    }
+  ],
   "assessment_results": [],
   "study_goals": [
     {
